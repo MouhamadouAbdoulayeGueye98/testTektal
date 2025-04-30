@@ -1,0 +1,88 @@
+<div class="flex flex-col lg:flex-row gap-4 relative">
+  <!-- Panneau de contrôle à gauche -->
+  <div class="flex flex-col gap-2 w-full lg:w-[300px]">
+    <!-- Zone de recherche -->
+    <input
+      [(ngModel)]="searchQuery"
+      placeholder="Rechercher un lieu..."
+      class="border p-2 rounded shadow"
+    />
+    <div class="flex gap-2">
+      <button
+        (click)="searchLocation()"
+        class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 flex-1"
+      >
+        Aller
+      </button>
+      <button
+        (click)="traceItineraire()"
+        [disabled]="!destination"
+        [ngClass]="{
+          'bg-green-600 hover:bg-green-700': destination,
+          'bg-gray-300 cursor-not-allowed': !destination
+        }"
+        class="text-white px-4 py-2 rounded shadow flex-1"
+      >
+        Tracer
+      </button>
+    </div>
+    <!-- Boutons supplémentaires -->
+    <div class="flex gap-2">
+      <button
+        (click)="clearItineraire()"
+        class="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700 flex-1"
+      >
+        Effacer
+      </button>
+      <button
+        (click)="recentrerSurUtilisateur()"
+        class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 flex-1"
+      >
+        Recentrer
+      </button>
+    </div>
+    <!-- Historique des recherches -->
+    <div class="mt-4 p-2 border rounded shadow bg-white max-h-40 overflow-auto">
+      <h3 class="font-semibold mb-2">Historique</h3>
+      <ul class="text-sm">
+        <li
+          *ngFor="let entry of searchHistory"
+          class="cursor-pointer hover:underline"
+          (click)="chargerDepuisHistorique(entry)"
+        >
+          {{ entry.label }}
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Zone de la carte -->
+  <div id="map" class="h-[500px] flex-1 rounded border shadow mt-4 lg:mt-0"></div>
+
+  <!-- Panneau d'itinéraire à droite -->
+  <div class="lg:w-[300px] w-full p-4 border rounded shadow bg-white overflow-auto max-h-[500px]">
+    <h2 class="text-lg font-semibold mb-2">🧭 Itinéraire</h2>
+    <div *ngIf="routeSummary" class="mb-2 text-sm">
+      <p><strong>Distance :</strong> {{ (routeSummary.totalDistance/1000) | number:'1.1-2'}} km</p>
+      <p>
+        <strong>Durée :</strong>
+        {{ (routeSummary.totalTime/60) | number:'1.0-0'}} min
+      </p>
+    </div>
+    <ul class="list-decimal list-inside space-y-1 text-sm text-gray-700">
+      <li *ngFor="let step of steps">{{ step }}</li>
+      <li *ngIf="steps.length === 0" class="italic text-gray-400">
+        Choisis une destination ou clique sur la carte.
+      </li>
+    </ul>
+  </div>
+
+  <!-- Bouton flottant de recentrage (optionnel, en doublon ici avec celui présent dans le panneau) -->
+  <button
+    (click)="recentrerSurUtilisateur()"
+    class="absolute top-4 right-4 z-[1000] bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700"
+    title="Recentrer sur ma position"
+  >
+    📍
+  </button>
+</div>
